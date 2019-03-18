@@ -10,7 +10,25 @@ import java.util.regex.Pattern;
 
 public class ItemParser {
     public List<Item> parseItemList(String valueToParse) {
-        return null;
+        valueToParse = valueToParse.toLowerCase();
+        List<String> singleItem = new ArrayList<>();
+        List<Item> parsedItem = new ArrayList<>();
+
+        Pattern pattern = Pattern.compile("name(.*?)##");
+        Matcher matcher = pattern.matcher(valueToParse);
+
+        while(matcher.find()) {
+            singleItem.add(matcher.group());
+        }
+        System.out.println(singleItem +"\n" + singleItem.size());
+        for (String s: singleItem) {
+            try {
+                parsedItem.add(parseSingleItem(s));
+            } catch (ItemParseException e) {
+                e.printStackTrace();
+            }
+        }
+        return parsedItem;
     }
 
     public Item parseSingleItem(String singleItem) throws ItemParseException {
@@ -18,18 +36,19 @@ public class ItemParser {
 
         singleItem = singleItem.toLowerCase();
 
-        Pattern pattern = Pattern.compile("[:|@|^|%](.*?)[;|##]");
+        Pattern pattern = Pattern.compile("[:|@|^|!|*|%](.*?)[;|##]");
         Matcher matcher = pattern.matcher(singleItem);
 
         while(matcher.find()) {
             matched.add(matcher.group(1));
         }
-        
-        String name = matched.get(0);
-        double price = Double.parseDouble(matched.get(1));
-        String type = matched.get(2);
-        String expiration = matched.get(3);
-
-        return new Item(name, price, type, expiration);
+        if(matched.size() == 4) {
+            String name = matched.get(0);
+            double price = Double.parseDouble(matched.get(1));
+            String type = matched.get(2);
+            String expiration = matched.get(3);
+            return new Item(name, price, type, expiration);
+        }
+        throw new ItemParseException();
     }
 }
