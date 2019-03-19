@@ -25,7 +25,7 @@ public class ItemParser {
             try {
                 parsedItem.add(parseSingleItem(s));
             } catch (ItemParseException e) {
-                e.printStackTrace();
+                parsedItem.add(new Item("Error", null, null, null));
             }
         }
         return parsedItem;
@@ -43,8 +43,14 @@ public class ItemParser {
             matched.add(matcher.group(1));
         }
         if(matched.size() == 4) {
+            double price;
             String name = matched.get(0);
-            double price = Double.parseDouble(matched.get(1));
+            if(matched.get(1).equals("")) {
+                price = 1.23;
+            }
+            else {
+                price = Double.parseDouble(matched.get(1));
+            }
             String type = matched.get(2);
             String expiration = matched.get(3);
             return new Item(name, price, type, expiration);
